@@ -1,0 +1,16 @@
+{
+  "name": "bun-example",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "eventemitter3": "^5.0.1",
+    "matchit": "^1.1.0",
+    "regexparam": "^3.0.0"
+  }
+}

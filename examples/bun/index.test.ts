@@ -1,0 +1,11 @@
+import { describe, expect, it } from 'bun:test'
+import app from '.'
+
+describe('My first test', () => {
+  it('Should return 200 Response', async () => {
+    const req = new Request('http://localhost/test')
+    const res = await app.fetch(req)
+    console.log(await res.json())
+    expect(res.status).toBe(200)
+  })
+})

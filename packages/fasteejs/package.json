@@ -1,19 +1,30 @@
 {
 	"name": "fasteejs",
 	"version": "1.0.0",
-	"description": "Blazingly fast express alternative",
+	"description": "Next gen blazing fast web application framework",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/pouchlabs/fasteejs.git"
 	},
 	"keywords": [
+		"fasteejs",
 		"api",
 		"backend",
 		"http",
+		"web",
+		"app",
+		"application",
+		"framework",
+		"router",
+		"cloudflare",
 		"websocket",
 		"ws",
 		"rest",
-		"nodejs"
+		"nodejs",
+		"bun",
+		"workers",
+		"deno",
+		"edge"
 	],
 	"author": "pouchlabs",
 	"license": "MIT",
@@ -30,7 +41,8 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"test:integration": "playwright test",
-		"test:unit": "vitest"
+		"test:unit": "vitest",
+		"demo":"node --watch src/lib/demo.js"
 	},
 	"exports": {
 		".": {

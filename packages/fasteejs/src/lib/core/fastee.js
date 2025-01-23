@@ -5,11 +5,11 @@ import parser from './perser.js';
 import detect from 'detect-port';
 import { logSuccess,logError} from '../utils/index.js';
 import sirv from "sirv";
-import compression from 'compression';
 import GracefulShutdown from './shutdown.js';
 import {DEV} from "esm-env";
 import colors from "kleur";
 import EventEmitter from 'eventemitter3';
+import compression from 'compression';
 import {textParser,jsonParser,urlencodedParser,send,json,reqValidator,resValidator,redirect,stream,text,html,ip} from "../middlewares/index.js"
 const fasteeEvent = new EventEmitter();
 
@@ -171,12 +171,13 @@ class Fastee extends Server{
 			.use(textParser)
 			.use(reqValidator)
 			.use(resValidator)
-			.use(compression())
+			
 		    .use(redirect)
 			.use(stream)
 			.use(html)
 			.use(text)
 			.use(ip)
+			.use(compression())
 		   this.port=null
 		   GracefulShutdown(this.server,
 			{
@@ -239,6 +240,6 @@ class Fastee extends Server{
 	  
 } 
 
-
+export {Server}
 export default Fastee
 
