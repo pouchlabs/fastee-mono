@@ -4,16 +4,8 @@
 import { parse, inject } from 'regexparam';
 import EventEmitter from 'eventemitter3';
 const EdgeEmitter = new EventEmitter();
-import Edge from "../../packages/edge/dist/index.js";
-
-class EdgeResponse extends Response{
-  constructor(data,opts={}){
-    super(data,opts)
-  }   
-  stream(){
-
-  }
-}
+import Edge from "../../packages/edge/src/lib/index.js";
+import {EdgeResponse} from '../../packages/edge/src/lib/index.js';
     
 const app = new Edge() 
  app.get("/api",()=>{
@@ -22,10 +14,10 @@ const app = new Edge()
  app.use(async(req)=>{
   req.id="hi"
  })
-app.get("/",async (req)=>{  
+app.get("/",async (req,res)=>{  
   
-      console.log(req.headers)
-  const res = new Response(`<div class="hero bg-base-200 min-h-screen">
+
+  return res.html(`<div class="hero bg-base-200 min-h-screen">
   <div class="hero-content flex-col lg:flex-row-reverse">
     <img
       src="https://img.daisyui.com/images/stock/photo-1635805737707-575885ab0820.webp"
@@ -97,9 +89,7 @@ app.get("/",async (req)=>{
 
 <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.23/dist/full.min.css" rel="stylesheet" type="text/css" />
 <script src="https://cdn.tailwindcss.com"></script>
-`) ;
-  res.headers.set("content-type","text/html"); 
-  return res
+`)
 })    
   
 

@@ -2,6 +2,7 @@ import { checktype } from './utils.js';
 import { parse, inject } from './regex.js';
 import { LoadGlobalWares } from './middlewares.js';
 import { EdgeRequest } from './request.js';
+import EdgeResponse  from './response.js';
 
   export  function parser(req) {
     let url = req.url;
@@ -153,26 +154,26 @@ import { EdgeRequest } from './request.js';
             //call bware
             let  bware = this.bwares.find(v=>v.base === new URL(request.url).pathname);
             if(bware){
-              let bres= await bware.fn(req);
+              let bres= await bware.fn(req,new EdgeResponse());
               if(bres && bres instanceof Response)return bres
             }
-            let resp = await handler.fn(req);
+            let resp = await handler.fn(req,new EdgeResponse() );
             if(resp instanceof Response){
               return resp
 
             }else{
               //
-              return this.onError(new Error(`${new URL(request.url).pathname} handler requires response object`),req)
+              return this.onError(new Error(`${new URL(request.url).pathname} handler requires response object`),req,new EdgeResponse() )
             }
             //}
           }else{
             //not found
-            return this.onNotFound(req,env)
+            return this.onNotFound(req,new EdgeResponse())
           }
   
          } catch (error) {
           console.log(error)
-          return this.onError(error,req)
+          return this.onError(error,req,new EdgeResponse())
          }
       
         };

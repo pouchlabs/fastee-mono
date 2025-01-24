@@ -3,7 +3,8 @@ import { Hono } from 'hono'
 const app = new Hono()
 
 app.get('/', (c) => {
-  return c.html(`<div class="hero bg-base-200 min-h-screen">
+
+  return c.html(`<div class="hero bg-base-200 min-h-screen"> 
   <div class="hero-content flex-col lg:flex-row-reverse">
     <img
       src="https://img.daisyui.com/images/stock/photo-1635805737707-575885ab0820.webp"
