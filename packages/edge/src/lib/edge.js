@@ -147,9 +147,12 @@ import EdgeResponse  from './response.js';
        if(ware instanceof Response){
         return  ware
        }
- 
-       let  handler = this.routes.find((h)=>h.pasedurl.pattern.test(new URL(request.url).pathname) && h.method === request.method); 
-          if (handler){
+       let handler;
+      for(let h of this.routes.values()){
+        if(h.pasedurl.pattern.test(new URL(request.url).pathname) && h.method === request.method)handler=h
+      }
+     
+       if (handler){
             
             //call bware
             let  bware = this.bwares.find(v=>v.base === new URL(request.url).pathname);
