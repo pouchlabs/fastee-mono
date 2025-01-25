@@ -147,33 +147,49 @@ import EdgeResponse  from './response.js';
        if(ware instanceof Response){
         return  ware
        }
-       let handler;
-      for(let h of this.routes.values()){
-        if(h.pasedurl.pattern.test(new URL(request.url).pathname) && h.method === request.method)handler=h
-      }
-     
-       if (handler){
-            
-            //call bware
-            let  bware = this.bwares.find(v=>v.base === new URL(request.url).pathname);
-            if(bware){
-              let bres= await bware.fn(req,new EdgeResponse());
+      
+  
+    let handlers=this.routes;
+    let handler;
+    let l =handlers.length;
+    let i =0;
+    // for(let i in handlers){ 
+    //   let h=handlers[i];
+    //   if(h.pasedurl.pattern.test(new URL(request.url).pathname) && h.method === request.method)handler=h;
+    // }
+     while(i<l){
+        let h = handlers[i++]
+         if(h.pasedurl.pattern.test(new URL(request.url).pathname) && h.method === request.method)
+          handler=h;
+         
+        }
+         
+        if(handler){
+       for(let b of this.bwares){
+            if(b.base === new URL(request.url).pathname){
+              let bres= await b.fn(req,new EdgeResponse());
               if(bres && bres instanceof Response)return bres
             }
-            let resp = await handler.fn(req,new EdgeResponse() );
-            if(resp instanceof Response){
-              return resp
-
-            }else{
-              //
-              return this.onError(new Error(`${new URL(request.url).pathname} handler requires response object`),req,new EdgeResponse() )
-            }
-            //}
-          }else{
-            //not found
-            return this.onNotFound(req,new EdgeResponse())
           }
-  
+
+      
+          let resp = await handler.fn(req,new EdgeResponse );
+          if(resp instanceof Response){
+            return resp
+
+          }else{
+            //
+            return this.onError(new Error(`${new URL(request.url).pathname} handler requires response object`),req,new EdgeResponse() )
+          }
+        
+        }else{
+          //not found
+          return this.onNotFound(req,new EdgeResponse())
+        }
+      
+        
+    
+         
          } catch (error) {
           console.log(error)
           return this.onError(error,req,new EdgeResponse())

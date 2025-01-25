@@ -1,7 +1,9 @@
 import { Hono } from 'hono'
 
 const app = new Hono()
-
+app.use((c)=>{
+c.id="hi"
+})
 app.get('/', (c) => {
 
   return c.html(`<div class="hero bg-base-200 min-h-screen"> 

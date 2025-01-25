@@ -9,14 +9,14 @@ import {EdgeResponse} from '../../packages/edge/src/lib/index.js';
     
 const app = new Edge() 
  app.get("/api",()=>{
-
+    
  })  
  app.use(async(req)=>{
   req.id="hi"
- })
+ })  
 app.get("/",async (req,res)=>{  
-  
-
+                  
+      
   return res.html(`<div class="hero bg-base-200 min-h-screen">
   <div class="hero-content flex-col lg:flex-row-reverse">
     <img
@@ -89,7 +89,7 @@ app.get("/",async (req,res)=>{
 
 <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.23/dist/full.min.css" rel="stylesheet" type="text/css" />
 <script src="https://cdn.tailwindcss.com"></script>
-`)
+`) 
 })    
   
 
