@@ -1,8 +1,9 @@
 import { Hono } from 'hono'
 
 const app = new Hono()
-app.use((c)=>{
+app.use(async (c,next)=>{
 c.id="hi"
+return await next()
 })
 app.get('/', (c) => {
 

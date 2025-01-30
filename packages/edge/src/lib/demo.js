@@ -1,13 +1,13 @@
-import { time } from "console";
+
 import {Edge} from "./edge.js";
-import http from "http";
-let server = http;
+
 let app = new Edge();
 app.get("/",()=>{
-    console.log("home",Date.now())
+   return {type:"html",data:"hi from home"}
 })
-app.route("get","/api/:id",()=>{});
+app.route("get","/api/:id",(req)=>{
+ console.log()
+ return {type:"html",data:"hi from home"}
+});
 app.route("get","/api",()=>{}); 
-console.log(app.routes)
-server.createServer(app.fetch)
-.listen(3000,"localhost")
+export default app

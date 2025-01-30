@@ -152,5 +152,83 @@ export default class EdgeResponse{
     return html
     
  } 
+   /**
+  * arraybuffer
+  * @param {any} data -data to send.
+  * @param {number} status -status code default 200
+  * @returns {object} returns a new response with buffer.
+  */
+   async arrayBuffer(data,status=200){
+      if(!data || data && typeof data !== "string" || status && typeof status !== "number"){
+          throw new Error("edge arrayBuffer method requires buffer  and status number")
+      }
+      let buffer =await new this.#response(data,{
+          status
+      }).arrayBuffer() 
+  
+      return buffer
+      
+   } 
+    /**
+  * blob
+  * @param {string} data -blob to send.
+  * @param {number} status -status code default 200
+  * @returns {object} returns a new response with blob.
+  */
+    async blob(data,status=200){
+      if(!data || data && typeof data !== "string" || status && typeof status !== "number"){
+          throw new Error("edge blob method requires blob  and status number")
+      }
+      let blob =await new this.#response(data,{
+          status
+      }).blob() 
+  
+      return blob
+      
+   } 
+    /**
+  * bytes
+  * @param {string} data -bytes to send.
+  * @param {number} status -status code default 200
+  * @returns {object} returns a new response with bytes.
+  */
+    async bytes(data,status=200){
+      if(!data || data && typeof data !== "string" || status && typeof status !== "number"){
+          throw new Error("edge bytes method requires byte  and status number")
+      }
+      let bytes =await new this.#response(data,{
+          status
+      }).bytes() 
+  
+      return bytes
+      
+   } 
+    /**
+  * clone
+  * 
+  * @returns {object} returns a new response with clone.
+  */
+    clone(){
+    
+      return this.#response.prototype.clone()
+      
+   } 
+    /**
+  * formdata
+  * @param {string} data -data to send.
+  * @param {number} status -status code default 200
+  * @returns {object} returns a new response with formdata.
+  */
+    async formData(data,status=200){
+      if(!data || data && typeof data !== "string" || status && typeof status !== "number"){
+          throw new Error("edge form method requires form  and status number")
+      }
+      let form =await new this.#response(data,{
+          status
+      }).formData() 
+  
+      return form
+      
+   } 
  
 }

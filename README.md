@@ -1,5 +1,5 @@
 ![fastee](https://fasteejs.top/icon.svg "fasteejs") 
-# fasteejs blazingly fast express alternative
+# Next gen blazing fast web application framework
 
 full featured backend webframework
 Fast, Lightweight,Built-in zod schema validator..

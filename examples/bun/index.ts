@@ -1,22 +1,22 @@
-
-//import { describe, expect, it } from 'bun:test';
-//import { exec, match, parse } from "matchit";
-import { parse, inject } from 'regexparam';
-import EventEmitter from 'eventemitter3';
-const EdgeEmitter = new EventEmitter();
-import Edge from "../../packages/edge/src/lib/index.js";
-import {EdgeResponse} from '../../packages/edge/src/lib/index.js';
-    
+import Edge from "../../packages/edge/src/lib/index.js"; 
 const app = new Edge() 
- app.get("/api",()=>{
     
- })  
  app.use(async(req)=>{
   req.id="hi"
- })  
-app.get("/",async (req,res)=>{  
+ },(req,res)=>{
+  //console.log(req.id)
+ //return new Response("b2all")
+})  
+ app.use("/users",(req)=>{
+  //return new Response("b1") 
+  req.id="h2"
+ },(req)=>{
+    //console.log(req.id)
+   //return new Response("b2")
+ })
+app.get("/users",async (req,res)=>{  
                   
-      
+        
   return res.html(`<div class="hero bg-base-200 min-h-screen">
   <div class="hero-content flex-col lg:flex-row-reverse">
     <img

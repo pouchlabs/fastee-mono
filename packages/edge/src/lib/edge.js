@@ -3,7 +3,7 @@ import { parse, inject } from './regex.js';
 import { LoadGlobalWares } from './middlewares.js';
 import { EdgeRequest } from './request.js';
 import EdgeResponse  from './response.js';
-
+//import {join} from "path"
   export  function parser(req) {
     let url = req.url;
     if (url === void 0) return url;
@@ -91,6 +91,61 @@ import EdgeResponse  from './response.js';
               
      
     }
+    async function handleHandlerResponse(resp,request){
+
+      //undefined
+      if(!resp){
+        throw new Error(`${new URL(request.url).pathname} handler requires response`);
+      }
+      //response
+      if(resp instanceof Response){ 
+        return resp
+      }
+      //object
+      if(checktype(resp) === checktype({})){
+        let {status,type,data,...rest}=resp;
+        let status_code= Number(status) || 200;
+        let others = rest || null;
+        if(data && type && typeof type === "string"){
+             switch(type){
+               case "html":
+                       //html
+                if(/^/.test(data)){
+                     let r = new EdgeResponse().html(data,status_code)
+                     return r
+                }
+          //err
+            throw new Error("handler received non html text")
+             
+                case "text":
+                  //text
+                  if(/^/.test(data)){
+                    let r = new EdgeResponse().text(data,status_code)
+                    return r
+                  }
+                  //err
+                  throw new Error("handler received non text")
+                  //json
+                  case "json":
+                    if(checktype(data) === checktype({})){
+                      let r = new EdgeResponse().json(data,status_code)
+                      return r
+                    }
+                    //err
+                    throw new Error("handler received non object")
+                  default:
+                    throw new Error("handler requires response")
+             }
+        }else{
+          throw new Error("data and type properties required,try return {type:'text',data:'hello world'}")
+        }
+       
+      }
+   
+   
+       
+
+    }
    
     /**
  * Fastee Edge class
@@ -138,61 +193,42 @@ import EdgeResponse  from './response.js';
          }
          let req;
          try {
-          let info = this.parse(request);
+          let handler = this.find(request.method,new URL(request.url).pathname);
           req= new EdgeRequest(request);
+          let res = new EdgeResponse();
           req.env=env;
           req.ctx=ctx;
+          if(handler)req.params=handler.params || {};
            //call global wares
-       let ware= await LoadGlobalWares(this,req,info);
+       let ware= await LoadGlobalWares(this,req);
        if(ware instanceof Response){
         return  ware
        }
       
-  
-    let handlers=this.routes;
-    let handler;
-    let l =handlers.length;
-    let i =0;
-    // for(let i in handlers){ 
-    //   let h=handlers[i];
-    //   if(h.pasedurl.pattern.test(new URL(request.url).pathname) && h.method === request.method)handler=h;
-    // }
-     while(i<l){
-        let h = handlers[i++]
-         if(h.pasedurl.pattern.test(new URL(request.url).pathname) && h.method === request.method)
-          handler=h;
-         
-        }
-         
+   
         if(handler){
        for(let b of this.bwares){
             if(b.base === new URL(request.url).pathname){
-              let bres= await b.fn(req,new EdgeResponse());
+              let bres= await b.fn(req,res);
               if(bres && bres instanceof Response)return bres
             }
           }
 
       
-          let resp = await handler.fn(req,new EdgeResponse );
-          if(resp instanceof Response){
-            return resp
-
-          }else{
-            //
-            return this.onError(new Error(`${new URL(request.url).pathname} handler requires response object`),req,new EdgeResponse() )
-          }
+          let resp = await handler.fn(req, res);
+          //handle response
+          return await handleHandlerResponse(resp,req); 
         
         }else{
           //not found
-          return this.onNotFound(req,new EdgeResponse())
+          return this.onNotFound(req,res)
         }
       
         
     
          
          } catch (error) {
-          console.log(error)
-          return this.onError(error,req,new EdgeResponse())
+          return this.onError(error,req,res)
          }
       
         };
@@ -232,15 +268,18 @@ import EdgeResponse  from './response.js';
   }
   
   find(method="",path="") {
+    let handlers=this.routes;
     let handler;
-    var i=0;
-    while (i< this.routes.length) {
-      handler=this.routes[i];
-       if(handler.method.toUpperCase() === method && handler.pasedurl.pattern.test(path))
-        return handler()
-        else null
-      i++
-    }
+    let l =handlers.length;
+      for (var i = 0; i < l; i++) {
+       let h = this.routes[i];
+       if(h.pasedurl.pattern.test(path) && h.method === method)
+        handler=h;
+      }
+      if(handler){
+        handler.params=exec(path,handler.pasedurl)
+        return handler
+      }
   } 
   
   use(base, ...fns) {
@@ -267,68 +306,7 @@ import EdgeResponse  from './response.js';
   }
   
   }
-  
-//   export class Edge{
-  
-//     constructor(opts={}){
-//     this.opts = opts;
-//     this.all = this.route.bind(this, '*');
-//     this.get = this.route.bind(this, 'GET');
-//     this.head = this.route.bind(this, 'HEAD');
-//     this.patch = this.route.bind(this, 'PATCH');
-//     this.options = this.route.bind(this, 'OPTIONS');
-//     this.connect = this.route.bind(this, 'CONNECT');
-//     this.delete = this.route.bind(this, 'DELETE');
-//     this.trace = this.route.bind(this, 'TRACE');
-//     this.post = this.route.bind(this, 'POST');
-//     this.put = this.route.bind(this, 'PUT');
-//     this.routes=[]
-//     this.fetch=(request,env={},ctx={})=>{
-//       //processor.preRequest(request);
-//        if(!request.url || typeof request.url !== "string" || request.url.length === 0 || !request.method || typeof request.method !== "string" || request.method.length === 0){
-//          throw new Error("valid request object required")
-//        }
-    
-//       let path = request.url || new URL(request.url).pathname;
-//       let l = this.routes.length;
-//       for (var i = 0; i < l; i++) {
-//         let  handler = this.routes[i];
-//           if (handler.pasedurl.pattern.test(path)){
-//             for(let func of handler.fns){
-//               return func(request,env)
-//             }
-//           }else{
-//             //not found
-//             return this.onNotFound(request,env)
-//           }
-              
-//       }
-    
-//     }
  
-// }
-
-// route(method="", pattern="", ...fns) {
-//     verify(pattern,fns,method);
-//      this.routes = add_route_to_routes(this,method.toUpperCase().trim(),pattern.trim(),fns);
-  
-//     return this;
-// }
-
-// find(method="", url="") {
-//     let arr = match(url, this.routes[method] || []);
-//     if (arr.length === 0) {
-//         arr = match(url, this.routes[method='*'] || []);
-//         if (!arr.length) return false;
-//     }
-//     return {
-//         params: exec(url, arr),
-//         handlers: this.handlers[method][arr[0].old]
-//     };
-// }
-
-
-// }
 
 
 export default Edge
