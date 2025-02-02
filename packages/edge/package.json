@@ -1,6 +1,7 @@
 {
 	"name": "@fasteejs/edge",
 	"version": "1.0.0",
+	"private":"false",
 	"description": "blazing fast web application framework",
 	"scripts": {
 		"dev": "vite dev",
