@@ -1,8 +1,12 @@
 {
 	"name": "@fasteejs/edge",
-	"version": "1.0.0",
-	"private":"false",
+	"version": "1.0.1",
 	"description": "blazing fast web application framework",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/pouchlabs/fasteejs.git"
+	  },
+
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run package",
@@ -72,5 +76,12 @@
 			"workers",
 			"deno",
 		"edge"
-	  ]
-}
+	  ],
+	  "author": "pouchlabs",
+	  "license": "MIT",
+	  "bugs": {
+		"url": "https://github.com/pouchlabs/fasteejs/issues"
+	  },
+	  "homepage": "https://fasteejs.top"
+	}
+	
