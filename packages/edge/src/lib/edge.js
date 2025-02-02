@@ -69,10 +69,6 @@ import EdgeResponse  from './response.js';
     //}
     }
     function add_route_to_routes(instance,method,pattern,fn){
-      // for(let app of instance.apps){
-      //   if(pattern.startsWith(app.base))pattern = app.base.concat(pattern.replace(app.base,"").trim()).trim()
-      // }
-          //new
           let newroute = {
               method:method,
               pasedurl:parse(pattern),
@@ -82,7 +78,7 @@ import EdgeResponse  from './response.js';
           let filtered = instance.routes.find((r)=>r.rawurl === newroute.rawurl);
               if(filtered){
                       //exists
-                      throw new Error("route already exist" + " " + newroute.rawurl)
+                 throw new Error("route already exist" + " " + newroute.rawurl)
               }else{
                       //add
                   instance.routes.push(newroute)
@@ -91,6 +87,7 @@ import EdgeResponse  from './response.js';
               
      
     }
+
     async function handleHandlerResponse(resp,request){
 
       //undefined
@@ -111,7 +108,9 @@ import EdgeResponse  from './response.js';
                case "html":
                        //html
                 if(/^/.test(data)){
-                     let r = new EdgeResponse().html(data,status_code)
+                     let r = new EdgeResponse()
+                     r.headers.append( "X-Content-Type-Options","nosniff")
+                     r.html(data,status_code)
                      return r
                 }
           //err
@@ -120,7 +119,9 @@ import EdgeResponse  from './response.js';
                 case "text":
                   //text
                   if(/^/.test(data)){
-                    let r = new EdgeResponse().text(data,status_code)
+                    let r = new EdgeResponse()
+                    r.headers.append( "X-Content-Type-Options","nosniff")
+                    r.text(data,status_code)
                     return r
                   }
                   //err
@@ -128,11 +129,63 @@ import EdgeResponse  from './response.js';
                   //json
                   case "json":
                     if(checktype(data) === checktype({})){
-                      let r = new EdgeResponse().json(data,status_code)
+                      let r = new EdgeResponse()
+                      r.headers.append( "X-Content-Type-Options","nosniff")
+                      r.json(data,status_code)
+                      
                       return r
                     }
                     //err
                     throw new Error("handler received non object")
+                    //stream
+                  case "stream":
+                  
+                    //json
+                      if(checktype(data) === checktype({}) && !data.readable || !data.stream || !data.writer){
+                        const response = new Response({
+                          [Symbol.asyncIterator]: async function* () {
+                          yield JSON.stringify(data);
+                          },
+                        },{
+                          status:status_code,
+                          ...rest
+
+                        });
+                        response.headers.append( "X-Content-Type-Options","nosniff")
+                        return response;
+                    }else{
+                        //normal stream
+                    //all text
+                    if(typeof data === "string" || typeof data === "number"){
+                        const response = new Response({
+                        [Symbol.asyncIterator]: async function* () {
+                          
+                          yield data
+                          
+                        },
+                        },{
+                          status:status_code,
+                          ...rest
+                    
+                        });
+                        response.headers.append( "X-Content-Type-Options","nosniff")
+                        return response;
+                    
+
+                      
+                    }else{
+                        const response = new Response(data,
+                          {
+                              status:200,
+                              ...rest
+                        
+                          }
+                        );
+                        response.headers.append( "X-Content-Type-Options","nosniff")
+                        return response;
+                    }
+
+                    }
                   default:
                     throw new Error("handler requires response")
              }
@@ -141,11 +194,8 @@ import EdgeResponse  from './response.js';
         }
        
       }
-   
-   
-       
-
     }
+
    
     /**
  * Fastee Edge class
@@ -173,9 +223,21 @@ import EdgeResponse  from './response.js';
       this.bwares=[];
       this.apps=[];
       this.parse=parser
+      /**
+       * no match handler
+       * @param {object} req 
+       * @param {object} res 
+       * @returns 
+       */
       this.onNotFound = (req,res)=>{
         return new Response("404 Not Found",{status:404})
       }
+      /**error handle
+       * @param {Error} err 
+       * @param {object} req 
+       * @param {object} res 
+       * @returns 
+       */
       this.onError = (err,req,res)=>{
         return new Response("internal error",{status:500})
       }
@@ -192,10 +254,11 @@ import EdgeResponse  from './response.js';
            throw new Error("valid request object required")
          }
          let req;
+         let res = new EdgeResponse();
          try {
           let handler = this.find(request.method,new URL(request.url).pathname);
           req= new EdgeRequest(request);
-          let res = new EdgeResponse();
+         
           req.env=env;
           req.ctx=ctx;
           if(handler)req.params=handler.params || {};
@@ -236,6 +299,13 @@ import EdgeResponse  from './response.js';
   
   return this
   }
+  /**
+   * 
+   * @param {string} method - http methods
+   * @param {string} pattern - url pattern eg "/","api/:id"
+   * @param {function} fn  - handler function return response
+   * @returns {object}
+   */
   route(method="", pattern="", fn) {
     verify(pattern,fn,method);
     if(this.routed && this.routed.base){
@@ -266,7 +336,12 @@ import EdgeResponse  from './response.js';
   
     return this;
   }
-  
+  /**
+   * find route
+   * @param {string} method 
+   * @param {string} path 
+   * @returns 
+   */
   find(method="",path="") {
     let handlers=this.routes;
     let handler;
@@ -281,7 +356,12 @@ import EdgeResponse  from './response.js';
         return handler
       }
   } 
-  
+  /**
+   * 
+   * @param {*} base 
+   * @param  {function} fns 
+   * @returns {object}
+   */
   use(base, ...fns) {
     if (typeof base === 'function') {
       this.wares = this.wares.concat(base, fns);

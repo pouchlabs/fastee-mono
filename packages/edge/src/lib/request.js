@@ -199,4 +199,3 @@ export class EdgeRequest{
    return this.#request.text();
  }
 }
-//new Request()

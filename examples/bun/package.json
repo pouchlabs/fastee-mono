@@ -9,6 +9,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@fasteejs/edge": "^1.0.0",
     "eventemitter3": "^5.0.1",
     "matchit": "^1.1.0",
     "regexparam": "^3.0.0"

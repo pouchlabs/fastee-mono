@@ -1,23 +1,19 @@
-import Edge from "../../packages/edge/src/lib/index.js"; 
+import Edge,{EdgeResponse} from "../../packages/edge/src/lib/index.js"; 
 const app = new Edge() 
     
- app.use(async(req)=>{
-  req.id="hi"
- },(req,res)=>{
-  //console.log(req.id)
- //return new Response("b2all")
-})  
- app.use("/users",(req)=>{
-  //return new Response("b1") 
-  req.id="h2"
- },(req)=>{
-    //console.log(req.id)
-   //return new Response("b2")
- })
-app.get("/users",async (req,res)=>{  
-                  
+ app.get("/",async (req,res)=>{
+  const foo = Bun.file("/Users/Daniel/Desktop/codding.mp4"); 
+
+//await foo.text(); // contents as a string
+    
+  return {type:"stream",data:foo,headers:{"content-type":"video/mp4"}}     
+  //return new Response(foo) 
+ })   
+app.get("/users",async (req: any,res: any)=>{   
+     const re = new EdgeResponse();
+
         
-  return res.html(`<div class="hero bg-base-200 min-h-screen">
+  return re.html(`<div class="hero bg-base-200 min-h-screen">
   <div class="hero-content flex-col lg:flex-row-reverse">
     <img
       src="https://img.daisyui.com/images/stock/photo-1635805737707-575885ab0820.webp"
@@ -31,7 +27,7 @@ app.get("/users",async (req,res)=>{
       <button class="btn btn-primary">Get Started</button>
     </div>
   </div>
-</div>
+</div> 
 <footer class="footer bg-base-300 text-base-content p-10">
   <nav>
     <h6 class="footer-title">Services</h6>
@@ -91,12 +87,8 @@ app.get("/users",async (req,res)=>{
 <script src="https://cdn.tailwindcss.com"></script>
 `) 
 })    
-  
 
-
-console.log(app)//app.wares.forEach(async (w,i)=>console.log(await w(),i)))
-app.port=4000 
-app.fetch  
+app.port=4000
 export default app 
      
      

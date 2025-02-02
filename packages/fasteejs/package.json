@@ -1,7 +1,7 @@
 {
 	"name": "fasteejs",
 	"version": "1.0.0",
-	"description": "Next gen blazing fast web application framework",
+	"description": "blazing fast web application framework",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/pouchlabs/fasteejs.git"

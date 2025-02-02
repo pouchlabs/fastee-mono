@@ -1,3 +1,5 @@
+import { checktype } from "./utils.js";
+
 
 /**fastee edgeresponse constructor.
  * @constructor 
@@ -84,23 +86,7 @@ export default class EdgeResponse{
   redirect(url,status){
     return this.#response.redirect(url,status)
  }
-   /**
-  * json
-  * @param {object} data -json to send.
-  * @param {number} status -status code default 200
-  * @returns {object} returns a new response with json.
-  */
-   json(data,status){
-    if(!data && typeof data !== typeof {} || status && typeof status !== "number"){
-        throw new Error("edge json method requires object and status number")
-    }
-    let json = new this.#response(JSON.stringify(data),{
-        status:200 || status,
-    })
-    json.headers.append("content-type","application/json")
-    return json
-    
- }
+
   /**
   * json
   * @param {object} data -json to send.
@@ -114,6 +100,7 @@ export default class EdgeResponse{
     let json = new this.#response(JSON.stringify(data),{
         status
     })
+    json.headers.append( "X-Content-Type-Options","nosniff")
     json.headers.append("content-type","application/json")
     return json
     
@@ -131,6 +118,7 @@ export default class EdgeResponse{
     let text = new this.#response(data,{
         status
     }) 
+    text.headers.append( "X-Content-Type-Options","nosniff")
     text.headers.append("content-type","text/plain")
     return text
     
@@ -149,6 +137,7 @@ export default class EdgeResponse{
         status
     }) 
     html.headers.append("content-type","text/html")
+    html.headers.append( "X-Content-Type-Options","nosniff")
     return html
     
  } 
@@ -223,12 +212,80 @@ export default class EdgeResponse{
       if(!data || data && typeof data !== "string" || status && typeof status !== "number"){
           throw new Error("edge form method requires form  and status number")
       }
-      let form =await new this.#response(data,{
+      let form = new this.#response(data,{
           status
-      }).formData() 
+      })
+      form.headers.append( "X-Content-Type-Options","nosniff")
+     await form.formData() 
   
       return form
       
    } 
+     /**
+  * @param {*} data -data to stream,eg html,string,json,number,readableStream
+  * 
+  * @param {string} type -content type,defaults to application/octet-stream
+  * @returns {object} - returns response as stream
+  */
+  async stream(data,type){
+
+   
+//json
+   if(checktype(data) === checktype({}) && !data.readable || !data.stream || !data.writer){
+      const response = new Response({
+         [Symbol.asyncIterator]: async function* () {
+         yield JSON.stringify(data);
+         },
+      },{
+         status:206,
+         headers:{
+            "content-type":type || "application/octet-stream",
+            "X-Content-Type-Options":"nosniff"
+         }
+
+      });
+      
+      return response;
+   }else{
+      //normal stream
+   //all text
+   if(typeof data === "string" || typeof data === "number"){
+      const response = new Response({
+      [Symbol.asyncIterator]: async function* () {
+         
+         yield data
+         
+      },
+      },{
+         status:206,
+         headers:{
+            "content-type":type || "application/octet-stream",
+            "X-Content-Type-Options":"nosniff"
+         }
+   
+      });
+      
+      return response;
+   
+  
+    
+   }else{
+      const response = new Response(data,
+         {
+            status:200,
+            headers:{
+               "content-type":type || "application/octet-stream",
+               "X-Content-Type-Options":"nosniff"
+            }
+      
+         }
+      );
+      
+      return response;
+   }
+
+   }
+
+ }
  
 }

@@ -1,24 +1,41 @@
 ![fastee](https://fasteejs.top/icon.svg "fasteejs") 
-# Next gen blazing fast web application framework
+# blazing fast web application framework
 
-full featured backend webframework
-Fast, Lightweight,Built-in zod schema validator..
+Built on web Standards
 
+Fast, Lightweight,runs on any JavaScript runtime
 # Features
  * fast
- * production ready
- * no production code required it just works
+ * middlewares
  * already know express Yei!
- * type safety endpoints
+ * multi-runtime
  * express ecosystem support
  * gracefully shutsdown
  * has built-in goodies
 
+## packages
+* Fastee - a blazing fast express alternative,runs on nodejs,bun and deno only.
+* edge - a web application framework can serve a hono alternative,it's fast,runs on bun,deno,and workers.
+
+# How to install Fastee
+found as fasteejs
+
+```bash
+npm install fasteejs
+```
+
+
+## How to install Edge
+found as @fasteejs/edge
+
+```bash
+npm install @fasteejs/edge
+``` 
  ```bash
   npm i fasteejs
  ```
- # usage
- 
+ # Fastee usage
+  runs on node,bun and deno
  ```js
    import {Fastee} from "fasteejs"
 
@@ -40,7 +57,35 @@ app.static("static",{dotfiles:false}) //pass valid folder path and optional conf
 
    export {app,app1,app2}
  ```
+ ## edge usage
+```js
+import Edge from "@fasteejs/edge" //or import {Edge} from "@fasteejs/edge"
 
-# what led to the developement of fasteejs
- maintaining production server api was  hectick and repetitive ,thus this gave birth to this awesome alternative.
+const app = new Edge();
 
+console.log(app)
+//global wares
+app.use((req,res)=>{//no next funtion required
+ req.id="ware1"
+},(req,res)=>{
+  console.log(req.id)
+  return res.json({msg:"success"})
+})
+//bwares route specific wares
+app.use("/api",(req,res)=>{//no next funtion required
+ req.id="ware1"
+},(req,res)=>{
+  console.log(req.id)
+  return res.json({msg:"success"})
+})
+/*handler
+a handler must return a response 
+*/
+app.get("/",async (req,res)=>{
+  console.log(req)
+  //object
+  return new Response("hi from server")//or return res.text("hi edge")
+})
+
+export default app //must do
+```
