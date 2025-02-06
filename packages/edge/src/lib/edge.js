@@ -358,8 +358,8 @@ import EdgeResponse  from './response.js';
   } 
   /**
    * 
-   * @param {*} base 
-   * @param  {function} fns 
+   * @param {string | function} base - route path or a function.
+   * @param  {function} fns -function handlers for middleware.
    * @returns {object}
    */
   use(base, ...fns) {
@@ -369,6 +369,7 @@ import EdgeResponse  from './response.js';
       this.wares = this.wares.concat(fns);
     } else {
       base = lead(base);
+      
       fns.forEach(fn => {
         if (fn instanceof Edge) {
           this.routed = {
@@ -384,6 +385,22 @@ import EdgeResponse  from './response.js';
     }
     return this; // chainable 
   }
+   /**
+   * Router - split funtionality
+   * @param {string} base -base route
+   * @example let api = app.Router("/api");
+   * api.get("/",async(req,res)=>{
+   * return res.json({msg:"test api"})
+   * })
+   * export default api
+   * @returns {Edge}
+   */
+  Router(base){
+    if(!base || base.length === 0 || typeof base !== "string")throw new Error("Router requires valid path");
+    
+    return this.use(base,this)
+  }
+
   
   }
  

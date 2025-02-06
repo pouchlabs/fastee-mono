@@ -1,12 +1,12 @@
 import Edge,{EdgeResponse} from "../../packages/edge/src/lib/index.js"; 
 const app = new Edge() 
-    
+  
  app.get("/",async (req,res)=>{
   const foo = Bun.file("/Users/Daniel/Desktop/codding.mp4"); 
 
 //await foo.text(); // contents as a string
     
-  return {type:"stream",data:foo,headers:{"content-type":"video/mp4"}}     
+  return {type:"stream",data:foo.slice(0,Infinity,"video/mp4"),headers:{"content-type":"video/mp4"}}     
   //return new Response(foo) 
  })   
 app.get("/users",async (req: any,res: any)=>{   
@@ -88,7 +88,11 @@ app.get("/users",async (req: any,res: any)=>{
 `) 
 })    
 
-app.port=4000
+
+let api = app.Router("api");
+api.get("/",async(req,res)=>{
+return res.json({msg:"test api"})
+})
 export default app 
      
      
